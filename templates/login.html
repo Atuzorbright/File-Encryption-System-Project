@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=2">
+    <title>Cryptographic Access Vault - Identity Gateway</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #F9F9FB;
+            --surface-card: #FFFFFF;
+            --accent-primary: #1E293B;
+            --accent-interactive: #2563EB;
+            --text-main: #0F172A;
+            --border-soft: #E2E8F0;
+        }
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .gateway-card {
+            background: var(--surface-card);
+            border: 1px solid var(--border-soft);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+            overflow: hidden;
+            max-width: 900px;
+            width: 100%;
+        }
+        .brand-panel {
+            background: linear-gradient(135deg, var(--accent-primary), #0F172A);
+            color: #FFFFFF;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .form-panel {
+            padding: 3rem;
+        }
+        .btn-custom {
+            background-color: var(--accent-interactive);
+            color: #FFFFFF;
+            font-weight: 500;
+            border-radius: 6px;
+            border: none;
+            transition: all 0.2s ease;
+        }
+        .btn-custom:hover {
+            background-color: #1D4ED8;
+            color: #FFFFFF;
+        }
+        .form-control {
+            border: 1px solid var(--border-soft);
+            border-radius: 6px;
+            padding: 0.6rem 0.8rem;
+        }
+        .form-control:focus {
+            border-color: var(--accent-interactive);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .toggle-link {
+            color: var(--accent-interactive);
+            text-decoration: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container p-3">
+    <div class="gateway-card mx-auto row g-0">
+        <div class="col-md-5 brand-panel text-center text-md-start">
+            <h2 class="fw-bold mb-3">UfuomaEncrypt v2026</h2>
+            <p class="text-white-50 fs-6">Military-Grade AES-256-GCM Relational File Encryption Framework.</p>
+            <div class="mt-4 pt-4 border-top border-secondary d-none d-md-block">
+                <small class="d-block text-white-50">✓ Direct Memory Streaming Extraction</small>
+                <small class="d-block text-white-50 mt-1">✓ Decentralized Payload Isolation</small>
+            </div>
+        </div>
+        
+        <div class="col-md-7 form-panel">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                            <small>{{ message }}</small>
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <div id="login-section">
+                <h4 class="fw-bold mb-4">Account Access Signature</h4>
+                <form action="{{ url_for('gateway_auth') }}" method="POST">
+                    <input type="hidden" name="action" value="login">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Gmail Address Username</label>
+                        <input type="email" name="email" class="form-control" placeholder="username@gmail.com" required autocomplete="username">
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Security Credential Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100 py-2 mb-3">Authorize Session</button>
+                    <p class="small text-muted mb-0">New Operator? <span class="toggle-link" onclick="toggleInterface(true)">Generate Security Profile</span></p>
+                </form>
+            </div>
+
+            <div id="register-section" style="display: none;">
+                <h4 class="fw-bold mb-4">Deploy Operator Clearance Profile</h4>
+                <form action="{{ url_for('gateway_auth') }}" method="POST">
+                    <input type="hidden" name="action" value="register">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Full Legal Name</label>
+                        <input type="text" name="name" class="form-control" placeholder="John Doe" autocomplete="name">
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Contact Telephone</label>
+                            <input type="tel" name="phone" class="form-control" placeholder="+123456789" autocomplete="tel">
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label small fw-semibold">Gmail Target Axis</label>
+                            <input type="email" name="email" class="form-control" placeholder="username@gmail.com" autocomplete="email">
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Establish Operational Password</label>
+                        <input type="password" name="password" class="form-control" placeholder="Minimum 8 complex characters" autocomplete="new-password">
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100 py-2 mb-3">Register Nodes</button>
+                    <p class="small text-muted mb-0">Already initialized? <span class="toggle-link" onclick="toggleInterface(false)">Return to Gateway</span></p>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function toggleInterface(showRegister) {
+        if(showRegister) {
+            document.getElementById('login-section').style.display = 'none';
+            document.getElementById('register-section').style.display = 'block';
+        } else {
+            document.getElementById('login-section').style.display = 'block';
+            document.getElementById('register-section').style.display = 'none';
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

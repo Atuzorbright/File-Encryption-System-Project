@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.5">
+    <title>Secure File Ledger - Workspace Console</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-canvas: #F8FAFC;
+            --surface-panel: #FFFFFF;
+            --text-primary: #1E293B;
+            --text-muted: #64748B;
+            --accent-action: #2563EB;
+            --border-soft: #F1F5F9;
+            --card-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+        }
+        body {
+            background-color: var(--bg-canvas);
+            color: var(--text-primary);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .workspace-navbar {
+            background-color: var(--surface-panel);
+            border-bottom: 1px solid #E2E8F0;
+            padding: 1rem 2rem;
+        }
+        .content-card {
+            background-color: var(--surface-panel);
+            border: 1px solid #E2E8F0;
+            border-radius: 10px;
+            box-shadow: var(--card-shadow);
+            padding: 2rem;
+            height: 100%;
+        }
+        .table-responsive-container {
+            background-color: var(--surface-panel);
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .custom-table th {
+            background-color: #F8FAFC;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
+            padding: 1rem;
+            border-bottom: 1px solid #E2E8F0;
+        }
+        .custom-table td {
+            padding: 1rem;
+            vertical-align: middle;
+            border-bottom: 1px solid #F1F5F9;
+            font-size: 0.875rem;
+        }
+        .btn-action {
+            background-color: var(--accent-action);
+            color: #FFFFFF;
+            font-size: 0.85rem;
+            font-weight: 500;
+            border: none;
+            border-radius: 6px;
+            padding: 0.5rem 1rem;
+            transition: opacity 0.2s;
+        }
+        .btn-action:hover {
+            opacity: 0.9;
+            color: #FFFFFF;
+        }
+        .badge-direction {
+            font-size: 0.75rem;
+            padding: 0.35rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+        .badge-inbound { background-color: #DCFCE7; color: #15803D; }
+        .badge-outbound { background-color: #DBEAFE; color: #1D4ED8; }
+    </style>
+</head>
+<body>
+
+<nav class="workspace-navbar d-flex justify-content-between align-items-center mb-5">
+    <div>
+        <span class="fw-bold text-dark fs-5">UfuomaEncrypt Dashboard</span>
+        <span class="text-muted ms-2 d-none d-sm-inline">| Operator Console</span>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+        <div class="text-end d-none d-md-block">
+            <span class="d-block small fw-semibold text-dark">{{ session['user_name'] }}</span>
+            <span class="d-block text-muted style" style="font-size: 11px;">{{ session['user_email'] }}</span>
+        </div>
+        <a href="{{ url_for('system_logout') }}" class="btn btn-outline-danger btn-sm px-3">Terminate Session</a>
+    </div>
+</nav>
+
+<div class="container-fluid px-4 px-md-5">
+    
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show mb-4" role="alert">
+                    <strong>Notice:</strong> {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <div class="row g-4">
+        <div class="col-lg-4">
+            <div class="content-card">
+                <h5 class="fw-bold text-dark mb-3">Initialize Encrypted Dispatch</h5>
+                <p class="text-muted small mb-4">Files are instantly transformed into AES-256 cipher blocks on-the-fly before storing or dispatching.</p>
+                
+                <form action="{{ url_for('user_workspace') }}" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label class="form-label small fw-semibold">Target Recipient (Gmail Username)</label>
+                        <input type="email" name="recipient_email" class="form-control form-control-sm" placeholder="recipient@gmail.com" required>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label small fw-semibold">Select Secure File Array (jpg, png, txt, doc, etc.)</label>
+                        <input type="file" name="secure_file" class="form-control form-control-sm" required>
+                    </div>
+                    <button type="submit" class="btn btn-action w-100 py-2">Encrypt & Dispatch Payload</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="content-card">
+                <h5 class="fw-bold text-dark mb-2">Cryptographic File Transaction Ledger</h5>
+                <p class="text-muted small mb-4">Secure matrix visualization mapping internal inbound and outbound records verified through authorization tokens.</p>
+                
+                <div class="table-responsive-container">
+                    <table class="table custom-table mb-0">
+                        <thead>
+                            <tr>
+                                <th>Vector</th>
+                                <th>Target Operator Entity</th>
+                                <th>Original Payload Reference</th>
+                                <th>Timestamp Vector</th>
+                                <th class="text-end">Cryptographic Access</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if transactions %}
+                                {% for item in transactions %}
+                                    <tr>
+                                        <td>
+                                            {% if item['sender_email'] == current_user %}
+                                                <span class="badge-direction badge-outbound">Outbound</span>
+                                            {% else %}
+                                                <span class="badge-direction badge-inbound">Inbound</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if item['sender_email'] == current_user %}
+                                                <span class="text-muted" style="font-size: 11px;">To:</span> {{ item['recipient_email'] }}
+                                            {% else %}
+                                                <span class="text-muted" style="font-size: 11px;">From:</span> {{ item['sender_email'] }}
+                                            {% endif %}
+                                        </td>
+                                        <td class="fw-medium text-dark">{{ item['original_filename'] }}</td>
+                                        <td class="text-muted" style="font-size: 12px;">{{ item['upload_timestamp'] }}</td>
+                                        <td class="text-end">
+                                            <a href="{{ url_for('view_secure_file', file_id=item['id']) }}" class="btn btn-action py-1 px-3">
+                                                View File
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5 text-muted">
+                                        No active cryptographic actions registered under this profile node context.
+                                    </td>
+                                </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
